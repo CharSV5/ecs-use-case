@@ -8,5 +8,11 @@ describe File_executor do
       '../scripts/1.createtable.sql'
       ]
     end
+    describe '.latest_version' do
+      it 'returns the latest version of the database' do
+        file_executor.create_table
+        expect(file_executor).to eq '1.createtable.sql'
+      end
+    end
   end
 end
