@@ -18,6 +18,9 @@ class File_executor
   def latest_version
     client = Mysql2::Client.new(:host => 'localhost', :username => 'charlene', :password => 'ecsdigital', :database => 'mydb')
     latest = client.query("SELECT Version FROM VersionTable WHERE ID = (SELECT MAX(ID) FROM VersionTable)")
+    version = ''
+    latest.each { |row| version = row['Version'] }
+    version
   end
 
   def all_files
