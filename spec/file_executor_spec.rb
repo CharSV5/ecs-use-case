@@ -1,7 +1,7 @@
-require 'file_executor'
+require 'file_executor scripts charlene localhost mydb ecsdigital'
 
-describe File_executor do
-  file_executor = File_executor.new
+describe FileExecutor do
+  file_executor = FileExecutor.new
   describe '.all_files' do
     it 'returns all the sql files in an array' do
     expect(file_executor.all_files).to eq ['../scripts/2.createtable.sql',
@@ -15,12 +15,12 @@ describe File_executor do
       end
     end
   end
-  describe '.update' do
+  describe '.new_versions' do
     it 'returns an array with the current version file names' do
       file_executor.create_table
       file_executor.all_files
       file_executor.latest_version
-      expect(file_executor.update).to eq ["../scripts/2.createtable.sql"]
+      expect(file_executor.new_versions).to eq ["../scripts/2.createtable.sql"]
     end
   end
 end
