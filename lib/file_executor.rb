@@ -6,20 +6,24 @@ class File_executor
 
   def db_details
     details = ARGV
-    if details.length < 5
+    if details.length < 4
       puts "Too few arguments"
       exit
     end
-    #details[0] = filename
-    #details[1] = directory with sql scripts
-    #details[2] = username for the db
-    #details[3] = db host
-    #details[4] = db name
-    #deatils[5] = db password
+    #details[0] = directory with sql scripts
+    #details[1] = username for the db
+    #details[2] = db host
+    #details[3] = db name
+    #deatils[4] = db password
     details
   end
+
+  def open_db
+    Mysql2::Client.new(:host => db_details[2], :username => db_details[1], :password => db_details[4], :database => db_details[3])
+  end
+
   def create_table
-    client = Mysql2::Client.new(:host => 'localhost', :username => 'charlene', :password => 'ecsdigital', :database => 'mydb')
+    client = open_db
     client.query("CREATE TABLE IF NOT EXISTS \
     VersionTable(Id INT PRIMARY KEY AUTO_INCREMENT, Version VARCHAR(25))")
     client.query("INSERT IGNORE INTO VersionTable(Version) VALUES('1.createtable.sql')")
@@ -31,7 +35,7 @@ class File_executor
   end
 
   def latest_version
-    client = Mysql2::Client.new(:host => 'localhost', :username => 'charlene', :password => 'ecsdigital', :database => 'mydb')
+    client = open_db
     latest = client.query("SELECT Version FROM VersionTable WHERE ID = (SELECT MAX(ID) FROM VersionTable)")
     version = ''
     latest.each { |row| version = row['Version'] }
@@ -54,7 +58,7 @@ class File_executor
     end
 
   def execute_sql
-    client = Mysql2::Client.new(:host => 'localhost', :username => 'charlene', :password => 'ecsdigital', :database => 'mydb')
+    client = open_db
     new_versions.each do
       |version| sql = File.open(version, 'rb') { |file| file.read }
       client.query(sql)
@@ -62,10 +66,10 @@ class File_executor
   end
 
   def update
-    client = Mysql2::Client.new(:host => 'localhost', :username => 'charlene', :password => 'ecsdigital', :database => 'mydb')
+    client = open_db
     new_versions.each do
       |version|
-      client.query("INSERT INTO VersionTable(Version) VALUES(#{version})")
+      client.query("INSERT INTO VersionTable(Version) VALUES(?)", version)
     end
   end
 
