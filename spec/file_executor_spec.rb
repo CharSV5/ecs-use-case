@@ -11,8 +11,16 @@ describe File_executor do
     describe '.latest_version' do
       it 'returns the latest version of the database' do
         file_executor.create_table
-        expect(file_executor).to eq '1.createtable.sql'
+        expect(file_executor.latest_version).to eq '1.createtable.sql'
       end
+    end
+  end
+  describe '.update' do
+    it 'returns an array with the current version file names' do
+      file_executor.create_table
+      file_executor.all_files
+      file_executor.latest_version
+      expect(file_executor.update).to eq ["../scripts/2.createtable.sql"]
     end
   end
 end

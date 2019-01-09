@@ -24,7 +24,18 @@ class File_executor
   end
 
   def all_files
-    puts files_array = Dir['../scripts/*.sql'].each {|file| file}
+    files_array = Dir['../scripts/*.sql'].each {|file| file}
+    files_array
+  end
+
+  def update
+    version_num = latest_version.scan(/\d/).join('')
+    new_version_array = []
+    all_files.each do
+      |version| num = version.scan(/\d/).join('')
+      num > version_num ? new_version_array.push(version) : ''
+    end
+    new_version_array
   end
 
 end
@@ -35,3 +46,4 @@ file_executor = File_executor.new
 file_executor.create_table
 file_executor.all_files
 file_executor.latest_version
+file_executor.update
