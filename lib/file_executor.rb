@@ -77,9 +77,6 @@ class FileExecutor
 
 end
 
-
-
-
 fileExecutor = FileExecutor.new
 fileExecutor.db_details
 fileExecutor.create_table
