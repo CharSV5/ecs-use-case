@@ -70,7 +70,7 @@ class FileExecutor
     client = open_db
     new_versions.each do
       |version|
-      client.query("INSERT INTO VersionTable(Version) VALUES('#{version.to_str}')")
+      client.query("INSERT INTO VersionTable(Version) VALUES('#{version}')")
     end
     client.close if client
   end
