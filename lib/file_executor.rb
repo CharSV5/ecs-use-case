@@ -26,7 +26,7 @@ class FileExecutor
   def create_table
     client = open_db
     client.query("CREATE TABLE IF NOT EXISTS \
-    VersionTable(Id INT PRIMARY KEY AUTO_INCREMENT, Version VARCHAR(25))")
+    VersionTable(Id INT PRIMARY KEY AUTO_INCREMENT, Version VARCHAR(35))")
     client.query("INSERT INTO VersionTable(Version) \
      VALUES('1.createtable.sql')")
      client.close if client
@@ -59,17 +59,23 @@ class FileExecutor
 
   def execute_sql
     client = open_db
-    new_versions.each do
-      |version| sql = File.open(version, 'rb') { |file| file.read }
+    new_versions.each do |version|
+      sql = File.open(version, 'rb') { |file| file.read }
       client.query(sql)
     end
     client.close if client
   end
 
+  def ordered_list
+    ordered_array = new_versions.map do |version|
+        version.split('/')[-1]
+    end
+    ordered_array.sort_by(&:to_i)
+  end
+
   def update
     client = open_db
-    new_versions.each do
-      |version|
+    ordered_list.each do |version|
       client.query("INSERT INTO VersionTable(Version) VALUES('#{version}')")
     end
     client.close if client
