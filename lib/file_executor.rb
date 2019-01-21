@@ -43,7 +43,7 @@ class FileExecutor
   end
 
   def all_files
-    Dir.glob("scripts/*.sql")  
+    Dir.glob("scripts/*.sql")
   end
 
   def new_versions
@@ -56,9 +56,13 @@ class FileExecutor
     new_version_array
     end
 
+    def new_versions_sorted
+      new_versions.sort_by { |x| x[/\d+/].to_i }
+    end
+
   def execute_sql
     client = open_db
-    new_versions.each do |version|
+    new_versions_sorted.each do |version|
       sql = File.open(version, 'rb') { |file| file.read }
       client.query(sql)
     end
@@ -70,6 +74,10 @@ class FileExecutor
         version.split('/')[-1]
     end
     ordered_array.sort_by(&:to_i)
+  end
+
+  def final_sql_list
+
   end
 
   def update
@@ -88,5 +96,6 @@ end
 # fileExecutor.all_files
 # fileExecutor.latest_version
 # fileExecutor.new_versions
+# fileExecutor.new_versions_sorted
 # fileExecutor.execute_sql
 # fileExecutor.update
