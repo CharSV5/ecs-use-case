@@ -43,7 +43,7 @@ class FileExecutor
   end
 
   def all_files
-    Dir.entries('scripts') - ["..", "."]
+    Dir.glob("scripts/*.sql")  
   end
 
   def new_versions
