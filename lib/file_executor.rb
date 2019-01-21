@@ -3,24 +3,24 @@
 require 'mysql2'
 
 class FileExecutor
+  attr_reader :files_array
+  # initialize method is for test purposes so arguments don't have to be provided
+  def initialize(directory = ARGV[0], username = ARGV[1], host = ARGV[2], database = ARGV[3], password = ARGV[4])
+    @details = []
+    @details.push(directory, username, host, database, password)
+  end
 
-  def db_details
-    details = ARGV
-    if details.length < 4
-      puts 'Too few arguments'
+  def verify_args
+    if ARGV.length != 5
+      puts 'Incorrect number of arguments, goodbye!'
       exit
     end
-    # details[0] = directory with sql scripts
-    # details[1] = username for the db
-    # details[2] = db host
-    # details[3] = db name
-    # deatils[4] = db password
-    details
   end
 
   def open_db
-    Mysql2::Client.new(:host => db_details[2], :username => db_details[1],
-      :password => db_details[4], :database => db_details[3])
+    puts "details = #{@details}"
+    Mysql2::Client.new(:host => @details[2], :username => @details[1],
+      :password => @details[4], :database => @details[3])
   end
 
   def create_table
@@ -43,8 +43,7 @@ class FileExecutor
   end
 
   def all_files
-    files_array = Dir['../scripts/*.sql'].each {|file| file}
-    files_array
+    Dir.entries('scripts') - ["..", "."]
   end
 
   def new_versions
@@ -83,11 +82,11 @@ class FileExecutor
 
 end
 
-fileExecutor = FileExecutor.new
-fileExecutor.db_details
-fileExecutor.create_table
-fileExecutor.all_files
-fileExecutor.latest_version
-fileExecutor.new_versions
-fileExecutor.execute_sql
-fileExecutor.update
+# fileExecutor = FileExecutor.new
+# fileExecutor.verify_args
+# fileExecutor.create_table
+# fileExecutor.all_files
+# fileExecutor.latest_version
+# fileExecutor.new_versions
+# fileExecutor.execute_sql
+# fileExecutor.update
