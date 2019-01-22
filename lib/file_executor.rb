@@ -1,7 +1,6 @@
 #!/usr/bin/ruby
 
 require 'mysql2'
-#on new instances @table_created evaluates to false
 
 class FileExecutor
   attr_reader :table_created
@@ -47,14 +46,14 @@ class FileExecutor
     version
   end
 
-  def all_files
-    Dir.glob("scripts/*.sql")
+  def update_database
+    UpdateDatabase.new
   end
 
   def new_versions
     version_num = latest_version.scan(/\d+/).join('')
     new_version_array = []
-    all_files.each do
+    update_database.all_files.each do
       |version| num = version.scan(/\d+/).join('')
       puts "num = #{num}"
       puts "version = #{version_num}"
@@ -97,7 +96,7 @@ class FileExecutor
   end
 
   def run_programme
-    all_files
+    update_database.all_files
     latest_version
     new_versions
     new_versions_sorted
