@@ -1,8 +1,7 @@
 #!/usr/bin/ruby
 
-require 'mysql2'
 require_relative 'update_database'
-require_relative 'file_executor'
+require_relative 'db_handler'
 
 class ScriptRunner
   def verify_args
@@ -13,7 +12,7 @@ class ScriptRunner
   end
 
   def db_handler
-    FileExecutor.new
+    DbHandler.new
   end
 
   def run_programme
