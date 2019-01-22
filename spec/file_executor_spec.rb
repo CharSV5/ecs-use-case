@@ -1,14 +1,21 @@
 require 'file_executor'
 describe FileExecutor do
   file_executor = FileExecutor.new("scripts", "charlene", "localhost", "mydb", "ecsdigital")
+  file_executor.clear_tables
   describe '.all_files' do
     it 'returns all the sql files in an array' do
     expect(file_executor.all_files).to eq ["scripts/1.createtable.sql", "scripts/11update.sql", "scripts/4.createtable.sql"]
     end
     describe '.latest_version' do
-      it 'returns the latest version of the database' do
+      it 'returns the an empty string if no latest version of the database' do
         file_executor.create_table
-        expect(file_executor.latest_version).to eq '1.createtable.sql'
+        expect(file_executor.latest_version.empty?).to eq true
+      end
+      it 'returns the latest version in the database if there is one' do
+        file_executor.create_table
+        file_executor.execute_sql
+        file_executor.update
+        expect(file_executor.latest_version).to eq '11update.sql'
       end
     end
   end
@@ -17,7 +24,7 @@ describe FileExecutor do
       file_executor.create_table
       file_executor.all_files
       file_executor.latest_version
-      expect(file_executor.new_versions).to eq ["scripts/11update.sql", "scripts/4.createtable.sql"]
+      expect(file_executor.new_versions).to eq ["scripts/1.createtable.sql", "scripts/11update.sql", "scripts/4.createtable.sql"]
     end
   end
   describe '.ordered_list' do
@@ -26,7 +33,7 @@ describe FileExecutor do
       file_executor.all_files
       file_executor.latest_version
       file_executor.new_versions
-      expect(file_executor.ordered_list).to eq ['4.createtable.sql', '11update.sql']
+      expect(file_executor.ordered_list).to eq ["1.createtable.sql", "4.createtable.sql", "11update.sql"]
     end
   end
   describe '.new_versions_sorted' do
@@ -35,7 +42,7 @@ describe FileExecutor do
       file_executor.all_files
       file_executor.latest_version
       file_executor.new_versions
-      expect(file_executor.new_versions_sorted).to eq ["scripts/4.createtable.sql", "scripts/11update.sql"]
+      expect(file_executor.new_versions_sorted).to eq ["scripts/1.createtable.sql", "scripts/4.createtable.sql", "scripts/11update.sql"]
 
     end
   end

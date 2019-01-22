@@ -1,10 +1,10 @@
 #!/usr/bin/ruby
 
 require 'mysql2'
+#on new instances @table_created evaluates to false
 
 class FileExecutor
-  attr_reader :files_array
-  # initialize method is for test purposes so arguments don't have to be provided
+  attr_reader :table_created
   def initialize(directory = ARGV[0], username = ARGV[1], host = ARGV[2], database = ARGV[3], password = ARGV[4])
     @details = []
     @details.push(directory, username, host, database, password)
@@ -26,10 +26,15 @@ class FileExecutor
   def create_table
     client = open_db
     client.query("CREATE TABLE IF NOT EXISTS \
-    VersionTable(Id INT PRIMARY KEY AUTO_INCREMENT, Version VARCHAR(35))")
-    client.query("INSERT INTO VersionTable(Version) \
-     VALUES('1.createtable.sql')")
-     client.close if client
+      VersionTable(Id INT PRIMARY KEY AUTO_INCREMENT, Version VARCHAR(35))")
+      client.close if client
+  end
+
+  def clear_tables
+    # for test purposes
+    client = open_db
+    client.query("DROP TABLE IF EXISTS VersionTable, UserTable, AddressTable, PeopleTable")
+    client.close if client
   end
 
   def latest_version
@@ -47,11 +52,18 @@ class FileExecutor
   end
 
   def new_versions
-    version_num = latest_version.scan(/\d/).join('')
+    version_num = latest_version.scan(/\d+/).join('')
     new_version_array = []
     all_files.each do
-      |version| num = version.scan(/\d/).join('')
-      new_version_array.push(version) if num > version_num
+      |version| num = version.scan(/\d+/).join('')
+      puts "num = #{num}"
+      puts "version = #{version_num}"
+      new_version_array.push(version) if num.to_i > version_num.to_i
+    end
+    puts "new version array = #{new_version_array}"
+    if new_version_array.empty?
+      puts 'You are already up to date!'
+      exit
     end
     new_version_array
     end
@@ -76,10 +88,6 @@ class FileExecutor
     ordered_array.sort_by(&:to_i)
   end
 
-  def final_sql_list
-
-  end
-
   def update
     client = open_db
     ordered_list.each do |version|
@@ -88,14 +96,18 @@ class FileExecutor
     client.close if client
   end
 
+  def run_programme
+    all_files
+    latest_version
+    new_versions
+    new_versions_sorted
+    execute_sql
+    update
+  end
+
 end
 
 # fileExecutor = FileExecutor.new
 # fileExecutor.verify_args
 # fileExecutor.create_table
-# fileExecutor.all_files
-# fileExecutor.latest_version
-# fileExecutor.new_versions
-# fileExecutor.new_versions_sorted
-# fileExecutor.execute_sql
-# fileExecutor.update
+# fileExecutor.run_programme
